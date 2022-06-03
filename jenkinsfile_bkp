@@ -23,7 +23,7 @@ pipeline {
             steps{
               echo 'Hello World'
               checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/pjitss/xgn.git']]])
-			  sh 'wars=`grep -A 2 jits /var/lib/jenkins/workspace/jenkinsvar2/pom.xml | grep version | cut -d "<"  -f2 | cut -d ">" -f2`'
+                          sh 'wars=`grep -A 2 jits /var/lib/jenkins/workspace/jenkinsvar2/pom.xml | grep version | cut -d "<"  -f2 | cut -d ">" -f2`'
                           sh "mvn -Dmaven.test.failure.ignore=true clean package"
             }
         }
@@ -91,10 +91,9 @@ pipeline {
             agent { label 'myuats' }
             steps {
                 sh 'whoami'
-		sh 'WARVERS=$(ssh root@myjenkins 'warvers=`grep -A 2 jits /var/lib/jenkins/workspace/jenkinsvar2/pom.xml | grep version | cut -d "<"  -f2 | cut -d ">" -f2`; echo $warvers')'
-                sh 'wget --user=admin --password=redhat http://192.168.1.34:8081/repository/maven-repository/com/example/jits/'${MYWARS}'/jits.'${MYWARS}'.war'
-                sh 'mv /artifactory/workspace/jenkinsvar1/${MYWARS}.war myuat.war'
-                sh 'cp /artifactory/workspace/jenkinsvar1/myuat.war /opt/tomcat/apache-tomcat-9.0.63/webapps/'
+                sh 'wget --user=admin --password=redhat http://192.168.1.34:8081/repository/maven-repository/com/example/jits/1.0.11/jits-1.0.11.war'
+                sh 'mv /artifactory/workspace/jenkinsvar2/*.11.war myuats.war'
+                sh 'cp /artifactory/workspace/jenkinsvar2/myuats.war /opt/tomcat/apache-tomcat-9.0.63/webapps/'
             }
         }
         stage("deploy to prod") {
@@ -102,9 +101,9 @@ pipeline {
             steps {
             input 'Do you want to proceed this in Prod'
             sh "whoami"
-            sh 'wget --user=admin --password=redhat http://192.168.1.34:8081/repository/maven-repository/com/efsavage/hello-world-war/1.0.8/hello-world-war-1.0.8.war'
-            sh 'mv /artifactory/workspace/jenkinsvar1/*.8.war myprod.war'
-            sh 'cp /artifactory/workspace/jenkinsvar1/myprod.war /opt/tomcat/apache-tomcat-9.0.63/webapps/'
+            sh 'wget --user=admin --password=redhat http://192.168.1.34:8081/repository/maven-repository/com/example/jits/1.0.11/jits-1.0.11.war'
+            sh 'mv /artifactory/workspace/jenkinsvar2/*.11.war myprods.war'
+            sh 'cp /artifactory/workspace/jenkinsvar2/myprods.war /opt/tomcat/apache-tomcat-9.0.63/webapps/'
             }
         }
     }
